@@ -140,9 +140,7 @@
             <input type="file" id="carPhoto" accept="image/*" onchange="handlePhotoUpload()" required>
             <img id="photoPreview" src="#" alt="Photo Preview">
           </div>
-          <div class="form-group">
-            <input type="hidden" id="entryTime" readonly required>
-          </div>
+          <input type="hidden" id="entryTime" required>
           <button type="submit" id="submitBtn">Submit Entry</button>
         </form>
       </div>
@@ -254,21 +252,22 @@
         TimeOut: "",
         Status: "Parked"
       };
+
       fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ data })
+        body: JSON.stringify({ data: [data] })
       })
-        .then(res => res.json())
-        .then(response => {
-          alert("Entry Submitted Successfully!");
-          document.getElementById("valetForm").reset();
-          valetNameDisplay.value = localStorage.getItem('valetName');
-          document.getElementById('photoPreview').style.display = 'none';
-        })
-        .catch(err => alert("Error submitting entry"));
+      .then(res => res.json())
+      .then(response => {
+        alert("Entry Submitted Successfully!");
+        document.getElementById("valetForm").reset();
+        valetNameDisplay.value = localStorage.getItem('valetName');
+        document.getElementById('photoPreview').style.display = 'none';
+      })
+      .catch(err => alert("Error submitting entry"));
     }
   </script>
 </body>
