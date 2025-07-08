@@ -141,12 +141,13 @@
             <img id="photoPreview" src="#" alt="Photo Preview">
           </div>
           <input type="hidden" id="entryTime" required>
+          <input type="hidden" id="photoData">
           <button type="submit" id="submitBtn">Submit Entry</button>
         </form>
       </div>
 
       <div id="exitForm" style="display:none">
-        <form id="exitCarForm">
+        <form id="exitCarForm" onsubmit="submitExit(event)">
           <div class="form-group">
             <label for="carExitNumber">Car Number *</label>
             <input type="text" id="carExitNumber" required>
@@ -162,8 +163,6 @@
   </div>
 
   <script>
-    const loginName = document.getElementById('loginName');
-    const loginPin = document.getElementById('loginPin');
     const valetNameDisplay = document.getElementById('valetNameDisplay');
     const entryTimeInput = document.getElementById('entryTime');
     let qrScanner;
@@ -189,15 +188,8 @@
     }
 
     function showForm(type) {
-      const entryForm = document.getElementById('entryForm');
-      const exitForm = document.getElementById('exitForm');
-      if (type === 'entry') {
-        entryForm.style.display = 'block';
-        exitForm.style.display = 'none';
-      } else {
-        entryForm.style.display = 'none';
-        exitForm.style.display = 'block';
-      }
+      document.getElementById('entryForm').style.display = type === 'entry' ? 'block' : 'none';
+      document.getElementById('exitForm').style.display = type === 'exit' ? 'block' : 'none';
     }
 
     function setTimeOut() {
@@ -212,6 +204,7 @@
           document.getElementById('photoPreview').src = e.target.result;
           document.getElementById('photoPreview').style.display = 'block';
           entryTimeInput.value = new Date().toLocaleString();
+          document.getElementById('photoData').value = e.target.result;
         }
         reader.readAsDataURL(file);
       }
@@ -247,27 +240,50 @@
         CarNumber: document.getElementById("carNumber").value,
         Phone: document.getElementById("phoneNumber").value || "null",
         Slot: document.getElementById("slot").value,
-        Valet: document.getElementById("valetNameDisplay").value,
-        TimeIn: document.getElementById("entryTime").value,
+        Valet: valetNameDisplay.value,
+        TimeIn: entryTimeInput.value,
         TimeOut: "",
-        Status: "Parked"
+        Status: "Parked",
+        Photo: document.getElementById("photoData").value
       };
 
       fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: [data] })
       })
       .then(res => res.json())
-      .then(response => {
+      .then(() => {
         alert("Entry Submitted Successfully!");
         document.getElementById("valetForm").reset();
         valetNameDisplay.value = localStorage.getItem('valetName');
         document.getElementById('photoPreview').style.display = 'none';
       })
-      .catch(err => alert("Error submitting entry"));
+      .catch(() => alert("Error submitting entry"));
+    }
+
+    function submitExit(event) {
+      event.preventDefault();
+      const carNumber = document.getElementById("carExitNumber").value;
+      const timeOut = document.getElementById("exitTime").value;
+
+      fetch(`https://sheetdb.io/api/v1/65f1eimq80yix/search?CarNumber=${carNumber}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            const updateUrl = `https://sheetdb.io/api/v1/65f1eimq80yix/CarNumber/${carNumber}`;
+            fetch(updateUrl, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ data: [{ TimeOut: timeOut, Status: "Exited" }] })
+            })
+            .then(() => alert("Exit updated successfully!"))
+            .catch(() => alert("Error updating exit"));
+          } else {
+            alert("Car not found.");
+          }
+        })
+        .catch(() => alert("Error fetching car entry"));
     }
   </script>
 </body>
