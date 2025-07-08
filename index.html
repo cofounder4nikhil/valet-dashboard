@@ -172,19 +172,26 @@
         Status: "Parked",
         photo: document.getElementById("photoData").value
       };
+
+      console.log("Sending to SheetDB:", data);
+
       fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: [data] })
       })
       .then(res => res.json())
-      .then(() => {
+      .then(response => {
+        console.log("SheetDB response:", response);
         alert("Entry Submitted Successfully!");
         document.getElementById("valetForm").reset();
         valetNameDisplay.value = localStorage.getItem('valetName');
         document.getElementById('photoPreview').style.display = 'none';
       })
-      .catch(() => alert("Error submitting entry"));
+      .catch(error => {
+        console.error("SheetDB error:", error);
+        alert("Error submitting entry");
+      });
     }
 
     function submitExit(event) {
