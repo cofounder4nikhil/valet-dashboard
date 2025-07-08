@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Park Monk - Valet Dashboard</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    img {
+      margin-top: 10px;
+      max-width: 100%;
+    }
+    .login-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .slot-counts {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .slot-count {
+      background: #e9f1ff;
+      border-radius: 8px;
+      padding: 10px;
+      width: 30%;
+      text-align: center;
+      font-weight: bold;
+      color: #003366;
+    }
+    #qr-reader, #qr-reader-exit {
+      width: 100%;
+      margin-top: 10px;
+      display: none;
+    }
+    .toggle-btns {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Park Monk - Valet Dashboard</h1>
+  <div class="container">
+    <div id="loginSection" class="login-section">
+      <input type="text" id="loginName" placeholder="Enter valet name">
+      <input type="password" id="loginPin" placeholder="Enter 4-digit PIN">
+      <button onclick="checkLogin()">Login</button>
+    </div>
+
+    <div id="mainDashboard" style="display:none">
+      <div class="toggle-btns">
+        <button onclick="showForm('entry')">Entry</button>
+        <button onclick="showForm('exit')">Exit</button>
+      </div>
+
+      <div id="entryForm" style="display:none">
+        <div class="slot-counts">
+          <div class="slot-count">L1: <span id="countL1">0</span>/10</div>
+          <div class="slot-count">L2: <span id="countL2">0</span>/10</div>
+          <div class="slot-count">L3: <span id="countL3">0</span>/10</div>
+        </div>
+        <form id="valetForm">
+          <!-- Your existing form fields -->
+        </form>
+      </div>
+
+      <div id="exitForm" style="display:none">
+        <form id="exitCarForm">
+          <!-- Your existing exit form fields -->
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loginName = document.getElementById('loginName');
+    const loginPin = document.getElementById('loginPin');
+
+    function checkLogin() {
+      const url = `https://sheetdb.io/api/v1/vezat3bd0xqkz/search?Valet=${loginName.value.trim()}&PIN=${loginPin.value.trim()}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            localStorage.setItem('valetName', loginName.value.trim());
+            alert('Login successful!');
+          } else {
+            alert('Invalid credentials. Try again.');
+          }
+        })
+        .catch(() => alert('Error verifying login'));
+    }
+  </script>
+</body>
+</html>
