@@ -107,7 +107,7 @@
           <div class="slot-count">L2: <span id="countL2">0</span>/10</div>
           <div class="slot-count">L3: <span id="countL3">0</span>/10</div>
         </div>
-        <form id="valetForm">
+        <form id="valetForm" onsubmit="submitEntry(event)">
           <div class="form-group">
             <label for="parkingId">Parking ID *</label>
             <button type="button" onclick="startQRScan()">Scan QR Code</button>
@@ -133,7 +133,7 @@
           </div>
           <div class="form-group">
             <label for="valetNameDisplay">Valet Name *</label>
-            <input type="text" id="valetNameDisplay" readonly>
+            <input type="text" id="valetNameDisplay" readonly required>
           </div>
           <div class="form-group">
             <label for="carPhoto">Upload Car Photo *</label>
@@ -141,8 +141,7 @@
             <img id="photoPreview" src="#" alt="Photo Preview">
           </div>
           <div class="form-group">
-            <label for="entryTime">Time In *</label>
-            <input type="text" id="entryTime" readonly required>
+            <input type="hidden" id="entryTime" readonly required>
           </div>
           <button type="submit" id="submitBtn">Submit Entry</button>
         </form>
@@ -168,6 +167,7 @@
     const loginName = document.getElementById('loginName');
     const loginPin = document.getElementById('loginPin');
     const valetNameDisplay = document.getElementById('valetNameDisplay');
+    const entryTimeInput = document.getElementById('entryTime');
     let qrScanner;
 
     function checkLogin() {
@@ -213,7 +213,7 @@
         reader.onload = function (e) {
           document.getElementById('photoPreview').src = e.target.result;
           document.getElementById('photoPreview').style.display = 'block';
-          document.getElementById('entryTime').value = new Date().toLocaleString();
+          entryTimeInput.value = new Date().toLocaleString();
         }
         reader.readAsDataURL(file);
       }
@@ -240,6 +240,35 @@
           alert("Camera access is needed to scan QR. Please allow camera permissions.");
         });
       }
+    }
+
+    function submitEntry(event) {
+      event.preventDefault();
+      const data = {
+        ParkingID: document.getElementById("parkingId").value,
+        CarNumber: document.getElementById("carNumber").value,
+        Phone: document.getElementById("phoneNumber").value || "null",
+        Slot: document.getElementById("slot").value,
+        Valet: document.getElementById("valetNameDisplay").value,
+        TimeIn: document.getElementById("entryTime").value,
+        TimeOut: "",
+        Status: "Parked"
+      };
+      fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ data })
+      })
+        .then(res => res.json())
+        .then(response => {
+          alert("Entry Submitted Successfully!");
+          document.getElementById("valetForm").reset();
+          valetNameDisplay.value = localStorage.getItem('valetName');
+          document.getElementById('photoPreview').style.display = 'none';
+        })
+        .catch(err => alert("Error submitting entry"));
     }
   </script>
 </body>
