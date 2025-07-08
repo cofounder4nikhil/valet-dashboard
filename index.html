@@ -136,8 +136,8 @@
             <input type="text" id="valetNameDisplay" readonly required>
           </div>
           <div class="form-group">
-            <label for="carPhoto">Upload Car Photo *</label>
-            <input type="file" id="carPhoto" accept="image/*" onchange="handlePhotoUpload()" required>
+            <label for="carPhoto">Click Car Photo *</label>
+            <input type="file" id="carPhoto" accept="image/*" capture="environment" onchange="handlePhotoUpload()" required>
             <img id="photoPreview" src="#" alt="Photo Preview">
           </div>
           <input type="hidden" id="entryTime" required>
@@ -244,7 +244,7 @@
         TimeIn: entryTimeInput.value,
         TimeOut: "",
         Status: "Parked",
-        Photo: document.getElementById("photoData").value
+        photo: document.getElementById("photoData").value
       };
 
       fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
