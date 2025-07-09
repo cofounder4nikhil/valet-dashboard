@@ -162,7 +162,7 @@
     function submitEntry(event) {
       event.preventDefault();
       const data = {
-        ParkingID: document.getElementById("parkingId").value,
+        ParkingId: document.getElementById("parkingId").value, // ✅ fixed
         CarNumber: document.getElementById("carNumber").value,
         Phone: document.getElementById("phoneNumber").value || "null",
         Slot: document.getElementById("slot").value,
