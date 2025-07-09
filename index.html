@@ -163,15 +163,15 @@ function submitEntry(event) {
   event.preventDefault();
 
   const data = {
-    ParkingId: document.getElementById("parkingId").value,
+    ParkingId: "L0-S0", // Default value
     CarNumber: document.getElementById("carNumber").value,
     Phone: document.getElementById("phoneNumber").value || "null",
-    Slot: document.getElementById("slot").value,
+    Slot: "L0-S0", // Default value
     Valet: valetNameDisplay.value,
-    TimeIn: entryTimeInput.value,
+    TimeIn: new Date().toLocaleString(),
     TimeOut: "",
     Status: "Parked",
-    photo: document.getElementById("photoData").value
+    photo: "" // Empty since photo removed
   };
 
   console.log("Sending to SheetDB:", data);
@@ -188,7 +188,6 @@ function submitEntry(event) {
       alert("✅ Entry Submitted Successfully!");
       document.getElementById("valetForm").reset();
       valetNameDisplay.value = localStorage.getItem('valetName');
-      document.getElementById('photoPreview').style.display = 'none';
     } else {
       alert("❌ Failed to add entry. Check data or API.");
     }
@@ -198,6 +197,7 @@ function submitEntry(event) {
     alert("Error submitting entry. See console for details.");
   });
 }
+
 
     function submitExit(event) {
       event.preventDefault();
