@@ -159,40 +159,45 @@
       ).catch(() => alert("Camera access is needed to scan QR. Please allow camera permissions."));
     }
 
-    function submitEntry(event) {
-      event.preventDefault();
-      const data = {
-        ParkingId: document.getElementById("parkingId").value, // ✅ fixed
-        CarNumber: document.getElementById("carNumber").value,
-        Phone: document.getElementById("phoneNumber").value || "null",
-        Slot: document.getElementById("slot").value,
-        Valet: valetNameDisplay.value,
-        TimeIn: entryTimeInput.value,
-        TimeOut: "",
-        Status: "Parked",
-        photo: document.getElementById("photoData").value
-      };
+function submitEntry(event) {
+  event.preventDefault();
 
-      console.log("Sending to SheetDB:", data);
+  const data = {
+    ParkingId: document.getElementById("parkingId").value,
+    CarNumber: document.getElementById("carNumber").value,
+    Phone: document.getElementById("phoneNumber").value || "null",
+    Slot: document.getElementById("slot").value,
+    Valet: valetNameDisplay.value,
+    TimeIn: entryTimeInput.value,
+    TimeOut: "",
+    Status: "Parked",
+    photo: document.getElementById("photoData").value
+  };
 
-      fetch("https://sheetdb.io/api/v1/65f1eimq80yix", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [data] })
-      })
-      .then(res => res.json())
-      .then(response => {
-        console.log("SheetDB response:", response);
-        alert("Entry Submitted Successfully!");
-        document.getElementById("valetForm").reset();
-        valetNameDisplay.value = localStorage.getItem('valetName');
-        document.getElementById('photoPreview').style.display = 'none';
-      })
-      .catch(error => {
-        console.error("SheetDB error:", error);
-        alert("Error submitting entry");
-      });
+  console.log("Sending to SheetDB:", data);
+
+  fetch("https://sheetdb.io/api/v1/czcf458liidwb", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: [data] })
+  })
+  .then(res => res.json())
+  .then(response => {
+    console.log("SheetDB response:", response);
+    if (response.created === 1) {
+      alert("✅ Entry Submitted Successfully!");
+      document.getElementById("valetForm").reset();
+      valetNameDisplay.value = localStorage.getItem('valetName');
+      document.getElementById('photoPreview').style.display = 'none';
+    } else {
+      alert("❌ Failed to add entry. Check data or API.");
     }
+  })
+  .catch(error => {
+    console.error("❌ SheetDB error:", error);
+    alert("Error submitting entry. See console for details.");
+  });
+}
 
     function submitExit(event) {
       event.preventDefault();
